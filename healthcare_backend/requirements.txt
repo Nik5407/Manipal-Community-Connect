@@ -1,0 +1,6 @@
+Django==5.2.4
+django-ninja==1.4.3
+djangorestframework-3.16.0
+djangorestframework_simplejwt==5.5.1
+psycopg2-binary==2.9.10
+python-dotenv==1.1.1
