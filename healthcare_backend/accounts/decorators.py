@@ -1,22 +1,27 @@
+# permissions.py
 from ninja.errors import HttpError
 from functools import wraps
 
 
-def role_required(allowed_roles):
-    def decorator(func):
-        @wraps(func)
-        def wrap(request, *args, **kwargs):
+def permission_required(*required_permissions):
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            user = request.auth
+            print("user in decorator",user)
 
-            user = request.auth  # JWTAuth will set request.auth to the logged-in user
-            print("user", user)
             if not hasattr(user, 'profile') or not user.profile.profile_type:
                 raise HttpError(403, "No profile or role associated with user")
 
-            user_role = user.profile.profile_type.type  # Get the role name (e.g., "admin")
-            print("user_role", user_role)
-            if user_role not in allowed_roles:
-                raise HttpError(403, f"Access denied for role: {user_role}")
-            return func(request, *args, **kwargs)
-        return wrap
+            profile_type = user.profile.profile_type
+            user_permissions = set(profile_type.permissions.values_list("code", flat=True))
+
+            for perm in required_permissions:
+                if perm not in user_permissions:
+                    raise HttpError(403, f"Permission '{perm}' is required")
+
+            return view_func(request, *args, **kwargs)
+        return wrapper
     return decorator
+
 

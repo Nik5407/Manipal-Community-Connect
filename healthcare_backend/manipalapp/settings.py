@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     #local apps
     'manipalapp',
     'accounts',
+    'supportgroup',
 ]
 
 MIDDLEWARE = [
@@ -141,9 +142,42 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",  # DB 1
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "JTI_CLAIM": "jti",
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+}
+
+# Google OAuth2 settings
+GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID')
+GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET')
+GOOGLE_OAUTH2_REDIRECT_URI = os.getenv('GOOGLE_OAUTH2_REDIRECT_URI', 'http://localhost:8000/api/v1/accounts/google/callback/')
+
+
+# OTP settings
+OTP_LOGIN_SETTINGS = {
+    "OTP_LENGTH": 6,
+    "TTL_SECONDS": 300,         # 5 minutes
+    "MAX_ATTEMPTS": 5,
+    "RESEND_COOLDOWN": 45,      # seconds between requests
+    "DAILY_REQUEST_LIMIT": 20,
 }

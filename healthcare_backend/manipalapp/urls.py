@@ -21,6 +21,7 @@ from manipalapp.api import api
 
 from .view import home_view
 from accounts.token_view import jwt_urlpatterns
+from accounts.views import login_view
 
 
 # Add router 
@@ -28,7 +29,10 @@ from accounts.token_view import jwt_urlpatterns
 
 urlpatterns = [
     path("", home_view),
+    path("login/", login_view, name="login"),
     path("admin/", admin.site.urls),
     path("api/v1/", api.urls),# Ninja API
     path("api/v1/auth/", include(jwt_urlpatterns)),  # DRF JWT views
+    # path("api/v1/accounts/", include("accounts.urls")),  # Accounts API including Google auth
+    # path("api/v1/services/", include("services.urls")),  # Services API including OTP
 ]
