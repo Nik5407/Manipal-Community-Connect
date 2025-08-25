@@ -1,0 +1,10 @@
+Django==5.2.4
+django-ninja==1.4.3
+djangorestframework==3.14.0
+djangorestframework_simplejwt==5.5.1
+redis==6.4.0
+django-redis==6.0.0
+psycopg2-binary==2.9.10
+python-dotenv==1.1.1
+google-auth==2.28.2
+requests==2.31.0
