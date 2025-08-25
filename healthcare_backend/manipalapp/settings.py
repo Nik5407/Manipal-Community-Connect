@@ -48,7 +48,11 @@ DEBUG = True
 AUTH_USER_MODEL = 'accounts.User'
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '35.207.255.32',
+]
 
 
 # Application definition
