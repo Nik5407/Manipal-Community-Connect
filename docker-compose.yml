@@ -1,0 +1,29 @@
+services:
+  mcc-backend:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile
+    container_name: mcc-backend
+    image: local/mcc-backend:latest
+    ports:
+      - "8000:8000"
+    env_file:
+      - infra/.env
+    volumes:
+      - .:/usr/src/app
+    # command: python manage.py runserver 0.0.0.0:8000
+
+  postgres:
+    image: postgres:17
+    container_name: mcc-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: manipal_development
+      POSTGRES_USER: user_manipal
+      POSTGRES_PASSWORD: 12345
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+      
+  redis:
+    image: redis:6.2-alpine
+    container_name: mcc-redis
