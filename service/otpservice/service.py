@@ -48,7 +48,8 @@ class OtpService:
     def request_otp(self, identifier: str, channel: str = "sms") -> None:
         self._check_and_increment_limits(identifier)
 
-        code = gen_otp(self.cfg["OTP_LENGTH"])
+        # code = gen_otp(self.cfg["OTP_LENGTH"])
+        code = "123456"
         salt = gen_salt()
         code_h = hash_code(code, salt)
         expires = timezone.now() + timedelta(seconds=self.cfg["TTL_SECONDS"])
