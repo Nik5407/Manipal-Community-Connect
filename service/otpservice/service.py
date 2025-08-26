@@ -119,7 +119,6 @@ class OtpService:
                 defaults={
                     "first_name": "",
                     "last_name": "",
-                    "email": user.email or f"temp_{user.phone_number}@example.com",
                     "gender": "other",
                     "date_of_birth": "2000-01-01"  # placeholder
                 }
