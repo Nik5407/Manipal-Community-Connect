@@ -10,7 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .sender import OtpSender
 from accounts.utils import gen_otp, gen_salt, hash_code, constant_time_eq
 from manipalapp.settings import OTP_LOGIN_SETTINGS
-from accounts.models import User, UserProfile
+from accounts.models import ProfileType, User, UserProfile
 from accounts.models import OtpVerification
 
 
@@ -174,6 +174,7 @@ class OtpService:
             profile.date_of_birth = profile_data['date_of_birth']
             profile.gender = profile_data['gender']
             profile.is_referred = profile_data.get('is_referred', False)
+            profile.profile_type = ProfileType.objects.get(type="user") # TODO: change in profile type
             user.email = profile_data['email']
             user.save()
             profile.save()

@@ -34,6 +34,7 @@ db.sqlite3-journal
 media/
 staticfiles/
 infra/.env
+postgres_data/
 
 # VS Code
 .vscode/
