@@ -49,7 +49,7 @@ class OtpService:
         self._check_and_increment_limits(identifier)
 
         # code = gen_otp(self.cfg["OTP_LENGTH"])
-        code = "123456"
+        code = "1234"
         salt = gen_salt()
         code_h = hash_code(code, salt)
         expires = timezone.now() + timedelta(seconds=self.cfg["TTL_SECONDS"])
