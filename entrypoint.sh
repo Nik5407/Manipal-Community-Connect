@@ -20,8 +20,7 @@ python manage.py migrate --noinput
 # run_process_tasks
 
 # Start uvicorn as the main process
-echo "Starting uvicorn server..."
-python manage.py process_tasks &
-exec uvicorn manipalapp.wsgi:application --host 0.0.0.0 --port 8000 --workers 2 
+echo "Starting gunicorn server..."
+exec gunicorn manipalapp.wsgi:application --bind 0.0.0.0:8000 --workers 2 
 # --worker-class uvicorn.workers.UvicornWorker
 exec "$@"
