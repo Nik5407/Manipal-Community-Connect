@@ -32,7 +32,8 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media/
-static/
+staticfiles/
+infra/.env
 
 # VS Code
 .vscode/
@@ -81,3 +82,19 @@ coverage.xml
 # Database
 *.sqlite3
 *.db
+
+# Docker
+.docker/
+docker-compose.override.yml
+*.env
+!prod.env.example
+
+# GCP
+*.pyc
+__pycache__
+.pytest_cache
+.coverage
+coverage.xml
+.gcloudignore
+.env.yaml
+.env.yml

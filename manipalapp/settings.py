@@ -14,27 +14,13 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from datetime import timedelta
-from decouple import Config, RepositoryEnv
 
-
-print("os.getenv")
-
-load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-print("os.getenv")
+load_dotenv(BASE_DIR / "infra/.env")
+
 ENVIRONMENT = os.getenv("ENVIRONMENT", "local")  # default local
-
-if ENVIRONMENT == "dev":
-    env_file = "dev.env"
-else:
-    env_file = "local.env"
-
-print("env_file", env_file)
-config = Config(RepositoryEnv(env_file))
-
-print("db_user", config("DB_USER"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -54,6 +40,11 @@ ALLOWED_HOSTS = [
     '35.207.255.32',
 ]
 
+CORS_ALLOW_ALL_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://35.207.255.32:3000',
+]
 
 # Application definition
 
@@ -111,11 +102,11 @@ WSGI_APPLICATION = 'manipalapp.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT"),
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
     }
 }
 
@@ -154,23 +145,27 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# Static files configuration
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+REDIS_URL = os.getenv('REDIS_URL')
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",  # DB 1
+        "LOCATION": REDIS_URL,  # DB 1
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
 }
-
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
@@ -187,9 +182,9 @@ SIMPLE_JWT = {
 }
 
 # Google OAuth2 settings
-GOOGLE_OAUTH2_CLIENT_ID = config('GOOGLE_OAUTH2_CLIENT_ID')
-GOOGLE_OAUTH2_CLIENT_SECRET = config('GOOGLE_OAUTH2_CLIENT_SECRET')
-GOOGLE_OAUTH2_REDIRECT_URI = config('GOOGLE_OAUTH2_REDIRECT_URI', 'http://localhost:8000/api/v1/accounts/google/callback/')
+GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID')
+GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET')
+GOOGLE_OAUTH2_REDIRECT_URI = os.getenv('GOOGLE_OAUTH2_REDIRECT_URI', 'http://localhost:8000/api/v1/accounts/google/callback/')
 
 
 # OTP settings
