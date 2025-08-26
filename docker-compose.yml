@@ -29,3 +29,8 @@ services:
   redis:
     image: redis:6.2-alpine
     container_name: mcc-redis
+
+  volumes:
+   postgres_data:
+  
+
