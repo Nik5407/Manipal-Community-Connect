@@ -1,7 +1,14 @@
 from ninja import Schema
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, List
+
+class GroupMemberOut(Schema):
+    id: int
+    full_name: str
+    email: str
+    roles: List[str]
+    joined_at: datetime
 
 class GroupCategoryOut(Schema):
     id: int
