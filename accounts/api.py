@@ -107,7 +107,7 @@ def get_user(request):
         Requires USER or ADMIN role
     """
     print("user value",request.user)
-    return UserOut.model_validate(get_object_or_404(User, email=request.user.email))
+    return UserOut.model_validate(get_object_or_404(User, phone_number=request.user.phone_number))
 
 
 @app.patch("/user/", response=UserOut)

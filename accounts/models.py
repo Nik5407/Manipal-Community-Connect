@@ -84,7 +84,8 @@ class User(AbstractBaseUser, PermissionsMixin):
             validate_phone_number(self.phone_number)
 
     def __str__(self):
-        return self.email
+        return f"User {self.id}"
+
 
 
 class ProfileType(models.Model):
