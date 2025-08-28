@@ -12,8 +12,9 @@ import requests as http_requests
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.constants import ROLES, PERMISSIONS
+from accounts.utils import validate_phone_number
 from manipalapp.jwt import JWTAuth
-from .schema import UserCreate, UserOut, UserPatch, GoogleAuthRequest, GoogleAuthResponse, RequestOtpIn, VerifyOtpIn, TokenOut, CompleteProfileIn
+from .schema import GoogleAuthError, UserCreate, UserOut, UserPatch, GoogleAuthRequest, GoogleAuthResponse, RequestOtpIn, VerifyOtpIn, TokenOut, CompleteProfileIn
 from .models import AuthProvider, UserProfile, ProfileType
 from accounts import decorators
 from service.otpservice.service import OtpService
@@ -200,16 +201,17 @@ def google_login(request):
     return HttpResponseRedirect(auth_url)
 
 
-@app.get("/google/callback/", response=GoogleAuthResponse, auth=None)
+@app.get(
+    "/google/callback/",
+    response={200: GoogleAuthResponse, 400: GoogleAuthError},  # can also use ErrorResponse
+    auth=None
+)
 def google_callback(request, code: str = None, error: str = None):
-    """
-    Handles the Google OAuth2 callback and creates/authenticates the user.
-    """
     if error:
-        return {"error": error}
+        return 400, GoogleAuthError(error=error)
 
     if not code:
-        return {"error": "Authorization code is missing"}
+        return 400, GoogleAuthError(error="Authorization code is missing")
 
     # Exchange code for tokens
     token_url = "https://oauth2.googleapis.com/token"
@@ -223,7 +225,7 @@ def google_callback(request, code: str = None, error: str = None):
 
     response = http_requests.post(token_url, data=token_data)
     if not response.ok:
-        return {"error": "Failed to get access token"}
+        return 400, GoogleAuthError(error="Failed to get access token")
 
     tokens = response.json()
 
@@ -235,19 +237,19 @@ def google_callback(request, code: str = None, error: str = None):
             settings.GOOGLE_OAUTH2_CLIENT_ID,
         )
     except ValueError:
-        return {"error": "Invalid ID token"}
+        return 400, GoogleAuthError(error="Invalid ID token")
 
     # Check if email exists and is verified
     email = id_info["email"]
     try:
         user = User.objects.get(email=email)
         if not user.is_email_verified:
-            return {"error": "Please verify your email through phone login first"}
-            
-        # Update auth provider to include Google
+            return 400, GoogleAuthError(error="Please verify your email through phone login first")
+
+        # Update auth provider
         user.auth_provider = AuthProvider.GOOGLE
         user.save(update_fields=["auth_provider"])
-        
+
         # Generate tokens
         refresh = RefreshToken.for_user(user)
         return GoogleAuthResponse(
@@ -256,7 +258,7 @@ def google_callback(request, code: str = None, error: str = None):
             user=UserOut.model_validate(user)
         )
     except User.DoesNotExist:
-        return {"error": "Please login with phone number first and verify your email"}
+        return 400, GoogleAuthError(error="Please login with phone number first and verify your email")
 
 # OTP API
 
@@ -264,6 +266,7 @@ def google_callback(request, code: str = None, error: str = None):
 @app.post("/request-otp", auth=None)
 def request_otp(request: HttpRequest, payload: RequestOtpIn):
     try:
+        validate_phone_number(payload.identifier)
         svc.request_otp(payload.identifier, payload.channel)
         return {"ok": True, "message": "OTP sent"}
     except ValueError as e:

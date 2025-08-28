@@ -1,7 +1,8 @@
-import os, hmac, hashlib, random, string, time
+import os, hmac, hashlib, random, string, re
 from typing import Tuple
 from django.conf import settings
-from datetime import datetime, timedelta, timezone as dt_tz
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 
 
 ALPHANUM = string.digits # numeric OTP
@@ -21,3 +22,17 @@ def hash_code(code: str, salt: str) -> str:
 
 def constant_time_eq(a: str, b: str) -> bool:
     return hmac.compare_digest(a, b)
+
+
+
+def validate_phone_number(value):
+    # Example: Indian numbers only, 10 digits
+    pattern = re.compile(r'^\d{10,12}$')
+    if not pattern.match(value):
+        raise ValidationError("Phone number must be 10-12 digits.")
+
+def validate_user_email(value):
+    try:
+        validate_email(value)
+    except ValidationError:
+        raise ValidationError("Enter a valid email address.")

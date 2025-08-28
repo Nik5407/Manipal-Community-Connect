@@ -46,6 +46,10 @@ class GoogleAuthResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class GoogleAuthError(BaseModel):
+    error: str
+
+
 # OTP schema
 class RequestOtpIn(Schema):
     identifier: str

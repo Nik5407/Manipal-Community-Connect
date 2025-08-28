@@ -2,6 +2,7 @@ import uuid
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 from django.utils import timezone
+from accounts.utils import validate_phone_number, validate_user_email
 
 
 # Permssion Model
@@ -30,6 +31,7 @@ class UserManager(BaseUserManager):
             phone_number=phone_number,
             **extra_fields
         )
+        user.full_clean()
         user.save(using=self._db)
         return user
 
@@ -52,9 +54,9 @@ class AuthProvider(models.TextChoices):
 
 class User(AbstractBaseUser, PermissionsMixin):
     # Core authentication fields
-    email = models.EmailField(unique=True, blank=True, null=True)
+    email = models.EmailField(unique=True, blank=True, null=True,validators=[validate_user_email])
     is_email_verified = models.BooleanField(default=False)
-    phone_number = models.CharField(max_length=15, unique=True)
+    phone_number = models.CharField(max_length=12, unique=True,validators=[validate_phone_number])
     auth_provider = models.CharField(
         choices=AuthProvider.choices,
         default=AuthProvider.PHONE
@@ -74,6 +76,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def clean(self):
+        if self.email:
+            validate_user_email(self.email)
+        if self.phone_number:
+            validate_phone_number(self.phone_number)
 
     def __str__(self):
         return self.email
