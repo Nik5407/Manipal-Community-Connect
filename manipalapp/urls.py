@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 from ninja import NinjaAPI
 from manipalapp.api import api
-
+from django.conf import settings
+from django.conf.urls.static import static
 from .view import home_view
 from accounts.token_view import jwt_urlpatterns
 from accounts.views import login_view
@@ -36,3 +37,6 @@ urlpatterns = [
     # path("api/v1/accounts/", include("accounts.urls")),  # Accounts API including Google auth
     # path("api/v1/services/", include("services.urls")),  # Services API including OTP
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

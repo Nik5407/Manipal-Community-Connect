@@ -1,6 +1,7 @@
 from ninja import NinjaAPI
 from django.contrib.auth.decorators import login_required
 from accounts.api import app as accounts_router
+from supportgroup.api import app as supportgroup_router
 from manipalapp.jwt import JWTAuth
 
 # Configure API with security scheme
@@ -36,3 +37,4 @@ api = NinjaAPI(
 
 # Add routers
 api.add_router("/accounts", accounts_router)
+api.add_router("/support-groups", supportgroup_router)
